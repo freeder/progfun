@@ -43,15 +43,13 @@ object Main {
 
   def balanceIter(counter: Int, chars: List[Char]): Boolean = {
     if (chars.isEmpty) (counter == 0)
+    else if (counter < 0) false
     else {
-      var next:Char = chars.head
-      //I do not like this code, other ways??
-      var incr:Int = 0
-      if (next == '(') incr = 1
-      else if (next == ')') incr = -1
+      val next:Char = chars.head
       //consume remaining chars
-      if (counter < 0) false
-      else balanceIter(counter + incr, chars.tail)
+      if (next == '(') balanceIter(counter + 1, chars.tail)
+      else if (next == ')') balanceIter(counter - 1, chars.tail)
+      else balanceIter(counter, chars.tail)
     }
   }
 
@@ -59,32 +57,11 @@ object Main {
    * Exercise 3
    */
   def countChange(money: Int, coins: List[Int]): Int = {
-    var options:List[List[Int]] = countChangeIter(money, coins)
-    //println("Changes for (" + money + ") with coins(" + coins + " are " + options)
-    options.length
-  }
-
-  def countChangeIter(money: Int, coins: List[Int]): List[List[Int]] = {
-    if (money == 0) List()
-    else if (!Option(coins).isDefined) List()
-    else if (coins.length == 0) List()
+    if (money == 0) 0
+    else if (coins.length == 0) 0
     else {
-      var changes:List[List[Int]] = List()
-      // Try with first coin
-      var coin:Int = coins.head
-      var remaining:Int = (money - coin)
-      if (remaining == 0) {
-        //If no change remaining we have a change
-        changes = changes :+ List(coin)
-      } else if (remaining > 0) {
-        //Else we continue counting with remaining
-        countChangeIter(remaining, coins).map((list) => changes = changes :+ (coin::list))
-      }
-
-      //Once first coin is exhausted then search only with other coins
-      countChangeIter(money, coins.tail).map((list) => changes = changes :+ list)
-
-      changes
+      val remaining:Int = (money - coins.head)
+      (if (remaining == 0) 1 else if (remaining > 0) countChange(remaining, coins) else 0) + countChange(money, coins.tail)
     }
   }
 }
